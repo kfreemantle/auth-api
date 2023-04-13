@@ -1,9 +1,16 @@
 'use strict';
 
 const express = require('express');
-const dataModules = require('../models');
+const dataModules = require('../../../api-server/src/models');
 
 const router = express.Router();
+
+const logger = require('../middleware/logger.js');
+
+const dataCollection = require('../models/data-collections.js'); // Update this line
+const clothesModel = require('../models/clothes/model.js');
+const foodModel = require('../models/food/model.js');
+
 
 router.param('model', (req, res, next) => {
   const modelName = req.params.model;
