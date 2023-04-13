@@ -1,24 +1,25 @@
 'use strict';
 
-const base64 = require('base-64');
-const { users } = require('../models');
+// Update the path to the users.js file
+const Users = require('../../models/users');
 
 module.exports = async (req, res, next) => {
+  // Check if the authorization header is present
+  if (!req.headers.authorization) {
+    next('Invalid Login');
+    return;
+  }
 
-  if (!req.headers.authorization) { return _authError(); }
-
-  let basic = req.headers.authorization.split(' ').pop();
-  let [user, pass] = base64.decode(basic).split(':');
+  // Extract the token from the authorization header
+  let token = req.headers.authorization.split(' ').pop();
 
   try {
-    req.user = await users.authenticateBasic(user, pass)
+    // Authenticate the user using the token
+    req.user = await Users.authenticateToken(token);
+    // If authentication is successful, call the next middleware
     next();
-  } catch (e) {
-    _authError()
-  }
-
-  function _authError() {
+  } catch (error) {
+    // If authentication fails, return an error with status 403
     res.status(403).send('Invalid Login');
   }
-
-}
+};
